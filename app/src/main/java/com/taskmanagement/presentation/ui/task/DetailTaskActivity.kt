@@ -38,7 +38,11 @@ class DetailTaskActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityDetailTaskBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
         val taskRepository = TaskRepository(FirebaseDatabase.getInstance())
         val factory = TaskViewModelFactory(taskRepository)
         viewModel = ViewModelProvider(this, factory).get(TaskViewModel::class.java)
