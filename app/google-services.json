@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "975477067805",
+    "project_id": "task-management-8f4f1",
+    "storage_bucket": "task-management-8f4f1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:975477067805:android:a22fa5f01f306f525a36f4",
+        "android_client_info": {
+          "package_name": "com.taskmanagement"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBq_Hv8XRN6uJkpgtDgxl0aVk8qOKxEdfI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
