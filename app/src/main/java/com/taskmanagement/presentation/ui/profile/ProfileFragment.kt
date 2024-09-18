@@ -59,7 +59,7 @@ class ProfileFragment : Fragment() {
             FirebaseAuth.getInstance().signOut()
             startActivity(Intent(requireContext(), AuthActivity::class.java))
             val editor = sharedPreferences.edit()
-            editor.putBoolean("loggedIn", true)
+            editor.putBoolean("loggedIn", false)
             editor.apply()
             requireActivity().finish()
         }
