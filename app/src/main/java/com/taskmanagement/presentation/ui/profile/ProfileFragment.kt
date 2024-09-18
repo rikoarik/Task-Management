@@ -60,7 +60,6 @@ class ProfileFragment : Fragment() {
             startActivity(Intent(requireContext(), AuthActivity::class.java))
             val editor = sharedPreferences.edit()
             editor.putBoolean("loggedIn", true)
-            editor.clear()
             editor.apply()
             requireActivity().finish()
         }
