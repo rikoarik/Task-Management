@@ -50,8 +50,10 @@ class TaskFragment : Fragment() {
         viewModel = ViewModelProvider(this, factory).get(TaskViewModel::class.java)
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
+        val selectedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
         userId?.let {
             viewModel.fetchTasks(it)
+            viewModel.fetchTasksByDate(it, selectedDate)
         }
 
         setupRecyclerView()
@@ -67,6 +69,7 @@ class TaskFragment : Fragment() {
             userId?.let {
                 viewModel.fetchTasksByDate(it, selectedDate)
             }
+
         }
     }
 
@@ -74,6 +77,7 @@ class TaskFragment : Fragment() {
         taskAdapter = TaskAdapter { task ->
             val intent = Intent(requireContext(), DetailTaskActivity::class.java)
             intent.putExtra("idTask", task.id)
+            intent.putExtra("statusTask", task.status)
             startActivity(intent)
         }
         binding.rvTaskList.adapter = taskAdapter

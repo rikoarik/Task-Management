@@ -2,6 +2,7 @@ package com.taskmanagement.presentation.ui.gallery
 
 import android.Manifest
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -31,6 +32,7 @@ class GalleryFragment : Fragment() {
 
     private lateinit var galleryAdapter: GalleryAdapter
     private lateinit var galleryViewModel: GalleryViewModel
+    private lateinit var progressDialog: ProgressDialog
 
     private val selectMediaLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -40,6 +42,7 @@ class GalleryFragment : Fragment() {
             selectedUri?.let {
                 val fileName = it.lastPathSegment ?: "Unknown file"
                 val fileId = UUID.randomUUID().toString()
+                progressDialog.show()
                 galleryViewModel.uploadFile(fileId, fileName, it)
                 Toast.makeText(requireContext(), "File selected: $fileName", Toast.LENGTH_SHORT).show()
             }
@@ -49,13 +52,17 @@ class GalleryFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentGalleryBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Uploading file...")
+        progressDialog.setCancelable(false)
 
         val fileRepository = FileRepository()
         val factory = GalleryViewModelFactory(fileRepository)
@@ -87,12 +94,14 @@ class GalleryFragment : Fragment() {
         }
 
         galleryViewModel.fileUploadResult.observe(viewLifecycleOwner) { fileUrl ->
+            progressDialog.dismiss()
             fileUrl?.let {
                 Toast.makeText(requireContext(), "File uploaded: $fileUrl", Toast.LENGTH_SHORT).show()
             }
         }
 
         galleryViewModel.uploadError.observe(viewLifecycleOwner) { errorMessage ->
+            progressDialog.dismiss()
             errorMessage?.let {
                 Toast.makeText(requireContext(), "Error: $it", Toast.LENGTH_SHORT).show()
             }

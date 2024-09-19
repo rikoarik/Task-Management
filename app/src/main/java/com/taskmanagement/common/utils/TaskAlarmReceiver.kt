@@ -37,19 +37,19 @@ class TaskAlarmReceiver : BroadcastReceiver() {
         if (taskId != null && updateStatus) {
             Log.d("TaskAlarmReceiver", "Updating status for taskId: $taskId to 'Ongoing'")
             repository.updateStatusTask(userId, taskId, "Ongoing")
-            taskTitle?.let { sendNotification(context, it) }
-
+            taskTitle?.let { sendNotification(context, it, "TASK_STARTED") }
         } else {
             if (taskTitle != null) {
-                Log.d("TaskAlarmReceiver", "Sending notification for task: $taskTitle")
-                sendNotification(context, taskTitle)
+                Log.d("TaskAlarmReceiver", "Sending 15 minutes before notification for task: $taskTitle")
+                sendNotification(context, taskTitle, "15_MIN_BEFORE")
             } else {
                 Log.e("TaskAlarmReceiver", "Task title is null, cannot send notification!")
             }
         }
+
     }
 
-    private fun sendNotification(context: Context?, taskTitle: String) {
+    private fun sendNotification(context: Context?, taskTitle: String, notificationType: String) {
         if (context == null) {
             Log.e("TaskAlarmReceiver", "Context is null, cannot send notification!")
             return
@@ -58,21 +58,36 @@ class TaskAlarmReceiver : BroadcastReceiver() {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val channelId = "TASK_CHANNEL_ID"
-        val channelName = "Task Notifications"
-        val channelDescription = "Channel for task notifications"
-        val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH).apply {
-            description = channelDescription
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelName = "Task Notifications"
+            val channelDescription = "Channel for task notifications"
+            val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH).apply {
+                description = channelDescription
+            }
+            notificationManager.createNotificationChannel(channel)
         }
-        notificationManager.createNotificationChannel(channel)
 
-        val notification = NotificationCompat.Builder(context, "TASK_CHANNEL_ID")
+        val notificationId = when (notificationType) {
+            "15_MIN_BEFORE" -> (taskTitle.hashCode() + 1000)
+            "TASK_STARTED" -> taskTitle.hashCode()
+            else -> taskTitle.hashCode()
+        }
+
+        val notificationText = when (notificationType) {
+            "15_MIN_BEFORE" -> "Task $taskTitle will start in 15 minutes!"
+            "TASK_STARTED" -> "Task $taskTitle is now Ongoing!"
+            else -> "Task Reminder: $taskTitle"
+        }
+
+        val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_notifications)
             .setContentTitle("Task Reminder")
-            .setContentText("Task $taskTitle is now Ongoing!")
+            .setContentText(notificationText)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .build()
 
-        notificationManager.notify(taskTitle.hashCode(), notification)
+        notificationManager.notify(notificationId, notification)
     }
+
 }

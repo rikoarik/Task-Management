@@ -48,10 +48,14 @@ class DetailTaskActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this, factory).get(TaskViewModel::class.java)
 
         val taskId = intent.getStringExtra("idTask")
+        val statusTask = intent.getStringExtra("statusTask")
         userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
         if (taskId != null) {
             viewModel.fetchTaskById(userId!!, taskId)
+        }
+        if (statusTask == "Done"){
+            binding.buttonTaskDone.visibility = android.view.View.GONE
         }
 
         setupObservers()
@@ -155,6 +159,7 @@ class DetailTaskActivity : AppCompatActivity() {
         if (taskId != null) {
             viewModel.updateTaskStatus(userId!!, taskId, "Done")
             Toast.makeText(this, "Task marked as Done", Toast.LENGTH_SHORT).show()
+            binding.buttonTaskDone.visibility = android.view.View.GONE
         }
     }
 

@@ -229,9 +229,10 @@ class AddTaskActivity : AppCompatActivity() {
         val reminderIntent = Intent(context, TaskAlarmReceiver::class.java).apply {
             putExtra("TASK_ID", task.id)
             putExtra("TASK_TITLE", "Reminder: ${task.title} will start in 15 minutes")
+            putExtra("NOTIFICATION_TYPE", "15_MIN_BEFORE")
         }
 
-        val reminderPendingIntent = createPendingIntent(context, task.id.hashCode(), reminderIntent)
+        val reminderPendingIntent = createPendingIntent(context, task.id.hashCode() + 1000, reminderIntent)
 
         val reminderTime = task.startTime - 15 * 60 * 1000
 
@@ -241,16 +242,15 @@ class AddTaskActivity : AppCompatActivity() {
             reminderPendingIntent
         )
 
-        // Notifikasi untuk memperbarui status task menjadi 'Ongoing'
         val ongoingIntent = Intent(context, TaskAlarmReceiver::class.java).apply {
             putExtra("TASK_ID", task.id)
             putExtra("TASK_TITLE", "Task ${task.title} is now Ongoing")
-            putExtra("UPDATE_STATUS", true) // Kirim sinyal untuk update status
+            putExtra("UPDATE_STATUS", true)
+            putExtra("NOTIFICATION_TYPE", "TASK_STARTED")
         }
 
         val ongoingPendingIntent = createPendingIntent(context, task.id.hashCode() + 1, ongoingIntent)
 
-        // Set alarm pada saat task mulai untuk memperbarui status
         alarmManager.setExact(
             AlarmManager.RTC_WAKEUP,
             task.startTime,
